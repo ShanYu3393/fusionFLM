@@ -104,22 +104,23 @@ main.simulation <- function (iter) {
   t0 <- proc.time()
   fitted.full.kmeans <- fusionFLM(data = data.simu, sp.basis1 = sp.basis1,
                                   sp.basis2 = sp.basis2,
-                                  edge.matrix.full, Lambda.list, 
+                                  edge.matrix = edge.matrix.full,
+                                  Lambda.list = Lambda.list, 
                                   initial.type = 'kmeans', 
                                   objective.path = FALSE, save.plot = FALSE)
   t.full.kmeans <- proc.time() - t0
   
   t0 <- proc.time()
   fitted.full.ind <- fusionFLM(data = data.simu, sp.basis1 = sp.basis1,
-                               sp.basis2 = sp.basis2, edge.matrix.full,
-                               Lambda.list, initial.type = 'individual', 
+                               sp.basis2 = sp.basis2, edge.matrix = edge.matrix.full,
+                               Lambda.list = Lambda.list, initial.type = 'individual', 
                                objective.path = FALSE, save.plot = FALSE)
   t.full.ind <- proc.time() - t0
   
   t0 <- proc.time()
   fitted.full.lasso <- fusionFLM(data = data.simu, sp.basis1 = sp.basis1,
-                                 sp.basis2 = sp.basis2, edge.matrix.full,
-                                 Lambda.list, initial.type = 'lasso', 
+                                 sp.basis2 = sp.basis2, edge.matrix = edge.matrix.full,
+                                 Lambda.list = Lambda.list, initial.type = 'lasso', 
                                  objective.path = FALSE, save.plot = FALSE)
   t.full.lasso <- proc.time() - t0
   

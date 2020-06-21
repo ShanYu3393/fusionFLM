@@ -29,10 +29,8 @@ source('oracle.FLM.R')
 
 
 # read in data
-# load('data/kinship.matrix.yield.rda')
-# load('data/true.group.5.rda')
-true.group.5 <- unlist(read.csv('data/true.group.5.csv'))
-kinship.matrix.yield <- as.matrix(read.csv('data/kinship.matrix.yield.csv'))
+load('data/kinship.matrix.yield.rda')
+load('data/true.group.5.rda')
 
 # simulation setting
 n.subgroup <- length(true.group.5)
@@ -109,20 +107,23 @@ simu.main <- function (iter) {
   
   # functional linear regression, sparse graph
   t0 <- proc.time()
-  fitted.sparse.g1 <- fusionFLM(data = data.simu, sp.basis, edge.matrix.prior,
-                                Lambda.list, initial.type = 'kmeans', 
+  fitted.sparse.g1 <- fusionFLM(data = data.simu, sp.basis = sp.basis, 
+                                edge.matrix = edge.matrix.prior,
+                                Lambda.list = Lambda.list, initial.type = 'kmeans', 
                                 objective.path = FALSE, save.plot = FALSE)
   t.sparse.g1 <- proc.time() - t0
   
   t0 <- proc.time()
-  fitted.sparse.g2 <- fusionFLM(data = data.simu, sp.basis, edge.matrix.prior,
-                                Lambda.list, initial.type = 'individual', 
+  fitted.sparse.g2 <- fusionFLM(data = data.simu, sp.basis = sp.basis, 
+                                edge.matrix = edge.matrix.prior,
+                                Lambda.list = Lambda.list, initial.type = 'individual', 
                                 objective.path = FALSE, save.plot = FALSE)
   t.sparse.g2 <- proc.time() - t0
   
   t0 <- proc.time()
-  fitted.sparse.g3 <- fusionFLM(data = data.simu, sp.basis, edge.matrix.prior,
-                                Lambda.list, initial.type = 'lasso', 
+  fitted.sparse.g3 <- fusionFLM(data = data.simu,  sp.basis = sp.basis, 
+                                edge.matrix = edge.matrix.prior,
+                                Lambda.list = Lambda.list, initial.type = 'lasso', 
                                 objective.path = FALSE, save.plot = TRUE)
   t.sparse.g3 <- proc.time() - t0
   

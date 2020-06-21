@@ -1,7 +1,18 @@
-fusionFLM <- function (data, sp.basis1, sp.basis2, 
+fusionFLM <- function (data, sp.basis = NULL,
+                       sp.basis1 = NULL, sp.basis2 = NULL, 
                        edge.matrix, Lambda.list,
                        initial.type = 'lasso', 
                        objective.path = FALSE, save.plot) {
+
+  if (!is.null(sp.basis) & is.null(sp.basis1) & is.null(sp.basis2)) {
+    sp.basis1 <- sp.basis
+    sp.basis2 <- sp.basis
+  } else if (is.null(sp.basis) & !is.null(sp.basis1) & !is.null(sp.basis2)) {
+    sp.basis1 <- sp.basis1
+    sp.basis2 <- sp.basis1
+  } else {
+    stop('no valid spline basis functions.')
+  }
   
   # calculate some basic parameters ---------------
   n.X <- length(data$X.list)
