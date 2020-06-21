@@ -48,10 +48,15 @@ plot(time.point, alpha1(time.point), type = "l", col = col[1], lwd = 2,
 points(time.point, alpha2(time.point), type = "l", col = col[2], lwd = 2)
 
 # spline basis
-N <- 4
+# use different knots for initial estimator and adaptive lasso
+# estimators.
+N1 <- 1
+N2 <- 4
 rho <- 2
-nbasis <- N + rho + 1
-sp.basis <- create.bspline.basis(t.range, nbasis = nbasis, norder = rho + 1)
+nbasis1 <- N1 + rho + 1
+nbasis2 <- N2 + rho + 1
+sp.basis1 <- create.bspline.basis(t.range, nbasis = nbasis1, norder = rho + 1)
+sp.basis2 <- create.bspline.basis(t.range, nbasis = nbasis2, norder = rho + 1)
 
 # fit the model
 lambda1 <- 10^seq(-2, 2, by = 1)
@@ -82,46 +87,56 @@ main.simulation <- function (iter) {
   # oracle estimator --------------------------------------------------------
   t0 <- proc.time()
   fitted.oracle <- oracle.FLM(data = data.simu, Q.list = Q.list,
-                              sp.basis = sp.basis)
+                              sp.basis = sp.basis2)
   t.oracle <- proc.time() - t0 
   
   # individual group estimator ----------------------------------------------
   t0 <- proc.time()
-  fitted.ind <- ind.FLM(data = data.simu, sp.basis)
+  fitted.ind <- ind.FLM(data = data.simu, sp.basis2)
   t.ind <- proc.time() - t0  
   
   # functional linear regression, k-means -----------------------------------
   t0 <- proc.time()
-  fitted.kmeans <- kmeans.fusionFLM(data = data.simu, sp.basis)
+  fitted.kmeans <- kmeans.fusionFLM(data = data.simu, sp.basis2)
   t.kmeans <- proc.time() - t0
   
   # functional linear regression, full graph --------------------------------
   t0 <- proc.time()
-  fitted.full.kmeans <- fusionFLM(data = data.simu, sp.basis, edge.matrix.full,
-                                  Lambda.list, initial.type = 'kmeans', 
+  fitted.full.kmeans <- fusionFLM(data = data.simu, sp.basis1 = sp.basis1,
+                                  sp.basis2 = sp.basis2,
+                                  edge.matrix.full, Lambda.list, 
+                                  initial.type = 'kmeans', 
                                   objective.path = FALSE, save.plot = FALSE)
   t.full.kmeans <- proc.time() - t0
   
   t0 <- proc.time()
-  fitted.full.ind <- fusionFLM(data = data.simu, sp.basis, edge.matrix.full,
+  fitted.full.ind <- fusionFLM(data = data.simu, sp.basis1 = sp.basis1,
+                               sp.basis2 = sp.basis2, edge.matrix.full,
                                Lambda.list, initial.type = 'individual', 
                                objective.path = FALSE, save.plot = FALSE)
   t.full.ind <- proc.time() - t0
   
   t0 <- proc.time()
-  fitted.full.lasso <- fusionFLM(data = data.simu, sp.basis, edge.matrix.full,
+  fitted.full.lasso <- fusionFLM(data = data.simu, sp.basis1 = sp.basis1,
+                                 sp.basis2 = sp.basis2, edge.matrix.full,
                                  Lambda.list, initial.type = 'lasso', 
                                  objective.path = FALSE, save.plot = FALSE)
   t.full.lasso <- proc.time() - t0
   
   
   # evaluation -------------------------------------------------------------
-  result.ind <- eval.FLM(fitted.ind, true.cluster, true.beta, true.alpha, sp.basis)
-  result.oracle <- eval.FLM(fitted.oracle, true.cluster, true.beta, true.alpha, sp.basis)
-  result.kmeans <- eval.FLM(fitted.kmeans, true.cluster, true.beta, true.alpha, sp.basis)
-  result.full.kmeans <- eval.FLM(fitted.full.kmeans, true.cluster, true.beta, true.alpha, sp.basis)
-  result.full.ind <- eval.FLM(fitted.full.ind, true.cluster, true.beta, true.alpha, sp.basis)
-  result.full.lasso <- eval.FLM(fitted.full.lasso, true.cluster, true.beta, true.alpha, sp.basis)
+  result.ind <- eval.FLM(fitted.ind, true.cluster, true.beta,
+                         true.alpha, sp.basis2)
+  result.oracle <- eval.FLM(fitted.oracle, true.cluster, true.beta,
+                            true.alpha, sp.basis2)
+  result.kmeans <- eval.FLM(fitted.kmeans, true.cluster, true.beta,
+                            true.alpha, sp.basis2)
+  result.full.kmeans <- eval.FLM(fitted.full.kmeans, true.cluster, true.beta,
+                                 true.alpha, sp.basis2)
+  result.full.ind <- eval.FLM(fitted.full.ind, true.cluster, true.beta,
+                              true.alpha, sp.basis2)
+  result.full.lasso <- eval.FLM(fitted.full.lasso, true.cluster, true.beta,
+                                true.alpha, sp.basis2)
   
   time.all <- c(t.oracle[3], t.kmeans[3], t.ind[3], 
                 t.full.kmeans[3], t.full.ind[3], t.full.lasso[3])
