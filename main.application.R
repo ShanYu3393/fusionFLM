@@ -33,11 +33,14 @@ load("data/covariate.sub.yield.rda")
 
 
 # spline basis
-N <- 2
+N1 <- 1
+N2 <- 4
 rho <- 2
-nbasis <- N + rho + 1
+nbasis1 <- N1 + rho + 1
+nbasis2 <- N2 + rho + 1
 t.range <- c(0, 2)
-sp.basis <- create.bspline.basis(t.range, nbasis = nbasis, norder = rho + 1)
+sp.basis1 <- create.bspline.basis(t.range, nbasis = nbasis1, norder = rho + 1)
+sp.basis2 <- create.bspline.basis(t.range, nbasis = nbasis2, norder = rho + 1)
 
 n.subgroup <- ncol(kinship.sub)
 
@@ -61,12 +64,12 @@ edge.matrix.prior <- edge.generating(
 
 # fit the model
 # fused lasso estimation
-lambda1 <- 10^seq(0, 3, by = 1)
-lambda2 <- 10^seq(0, 2, by = 0.5)
+lambda1 <- 10^seq(0, 5, by = 1)
+lambda2 <- 10^seq(0, 5, by = 0.5)
 Lambda1 <- expand.grid(lambda1, lambda2)
 # Lambda1=c(100,100)
-lambda1 <- 10^seq(-2, 2, by = 1)
-lambda2 <- 10^seq(-2, 0, by = 1)
+lambda1 <- 10^seq(-2, 5, by = 1)
+lambda2 <- 10^seq(-2, 5, by = 1)
 Lambda2 <- expand.grid(lambda1, lambda2)
 
 Lambda.list <- list(Lambda1, Lambda2)
@@ -80,7 +83,7 @@ dat.yield$subgroup.id <- as.matrix(model.matrix(~ yield.sub$Pedigree + 0))
 
 # # individual group estimator
 t0 <- proc.time()
-fitted.ind <- ind.FLM(data = dat.yield, sp.basis)
+fitted.ind <- ind.FLM(data = dat.yield, sp.basis2)
 t.ind <- proc.time() - t0
 # 
 # # functional linear regression, k-means
@@ -91,11 +94,12 @@ t.ind <- proc.time() - t0
 # functional linear regression, sparse graph
 t0 <- proc.time()
 fitted.sparse <- fusionFLM(
-  data = dat.yield, sp.basis, edge.matrix.prior,
-  Lambda.list, initial.type = "lasso",
+  data = dat.yield, sp.basis1 = sp.basis1,
+  sp.basis2 = sp.basis2, edge.matrix = edge.matrix.prior,
+  Lambda.list = Lambda.list, initial.type = "lasso",
   objective.path = FALSE, save.plot = FALSE
 )
 t.sparse <- proc.time() - t0
-fitted.sparse <- fitted.sparse.g1
-save(file = 'result/fitted.application.7.RData', fitted.sparse)
+# fitted.sparse <- fitted.sparse.g1
+save(file = 'result/appMST.RData', fitted.sparse)
 

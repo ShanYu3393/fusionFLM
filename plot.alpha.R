@@ -1,4 +1,4 @@
-plot.alpha <- function(Coeff, basis, 
+plot.alpha <- function(Coeff, sp.basis, 
                        group = rep(1, ncol(Coeff)), lwd = 0.5) {
   # decide ylim
   t.range <- sp.basis$rangeval
